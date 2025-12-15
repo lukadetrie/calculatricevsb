@@ -1,0 +1,87 @@
+Public Class Form1
+
+    Private firstValue As Double = 0.0
+    Private operation As String = ""
+    Private isNewValue As Boolean = True
+
+    Private Sub Number_Click(sender As Object, e As EventArgs) _
+        Handles btn0.Click, btn1.Click, btn2.Click, btn3.Click, btn4.Click, btn5.Click, btn6.Click, btn7.Click, btn8.Click, btn9.Click, btnDecimal.Click
+
+        Dim clickedButton As Button = CType(sender, Button)
+        Dim buttonText As String = clickedButton.Text
+
+        If isNewValue Then
+            txtDisplay.Text = buttonText
+            isNewValue = False
+        Else
+            If buttonText = "." And txtDisplay.Text.Contains(".") Then
+                Exit Sub
+            End If
+            txtDisplay.Text &= buttonText
+        End If
+    End Sub
+
+    Private Sub Operator_Click(sender As Object, e As EventArgs) _
+        Handles btnAdd.Click, btnSubtract.Click, btnMultiply.Click, btnDivide.Click
+
+        If operation <> "" And Not isNewValue Then
+            btnEquals.PerformClick()
+        End If
+
+        If Double.TryParse(txtDisplay.Text, firstValue) Then
+            operation = CType(sender, Button).Text
+            isNewValue = True
+        Else
+            MessageBox.Show("Erreur de format de nombre.", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
+    End Sub
+
+    Private Sub btnEquals_Click(sender As Object, e As EventArgs) Handles btnEquals.Click
+        If operation = "" Or isNewValue Then
+            Exit Sub
+        End If
+
+        Dim secondValue As Double
+        
+        If Double.TryParse(txtDisplay.Text, secondValue) Then
+            Dim result As Double = 0.0
+
+            Select Case operation
+                Case "+"
+                    result = firstValue + secondValue
+                Case "-"
+                    result = firstValue - secondValue
+                Case "*"
+                    result = firstValue * secondValue
+                Case "/"
+                    If secondValue <> 0 Then
+                        result = firstValue / secondValue
+                    Else
+                        txtDisplay.Text = "ERREUR (Div par 0)"
+                        firstValue = 0.0
+                        operation = ""
+                        isNewValue = True
+                        Exit Sub
+                    End If
+                Case Else
+                    Exit Sub
+            End Select
+
+            txtDisplay.Text = result.ToString()
+            firstValue = result 
+            operation = "" 
+            isNewValue = True 
+
+        Else
+            MessageBox.Show("Erreur de format de la deuxième valeur.", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
+    End Sub
+
+    Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
+        txtDisplay.Text = "0"
+        firstValue = 0.0
+        operation = ""
+        isNewValue = True
+    End Sub
+
+End Class
